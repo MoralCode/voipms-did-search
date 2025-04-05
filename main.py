@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 import json
+import argparse
 
 load_dotenv()
 ## App below
@@ -61,6 +62,13 @@ def add_row(table,did,search_string,search_term):
     )
 
 def main():
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--search-type", choices=["contains", "startswith", "endswith"], default="contains", help="the type of search to perform")
+
+    args = parser.parse_args()
+
     console = Console()
     states = []
     results = []
@@ -98,7 +106,7 @@ def main():
             search_string = search_term
         console.print(f"Searching for'[b]{search_term.upper()}[/b]' ({search_string})")
 
-        search_response: dict[str,str|list[dict[str,str|int]]] = api_action("searchDIDsUSA",type="contains",query=search_string)
+        search_response: dict[str,str|list[dict[str,str|int]]] = api_action("searchDIDsUSA",type=args.search_type,query=search_string)
         resp = search_response['dids']
         for r in resp:
             r["searchterm"] = search_term
