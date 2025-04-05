@@ -61,6 +61,32 @@ def add_row(table,did,search_string,search_term):
         noyes(did['sms'])
     )
 
+def performSearch(search_term: str, search_type="contains", limit_state=False):
+    if search_term.isalpha():
+        search_string = strToT9(search_term)
+    else: 
+        search_string = search_term
+
+    api_action_args = {
+        "type": search_type,
+        "query": search_string,
+
+    }
+    if limit_state:
+        api_action_args.update({
+            "state": limit_state
+        })
+    search_response: dict[str,str|list[dict[str,str|int]]] = api_action("searchDIDsUSA", **api_action_args)
+    resp = search_response.get("dids")
+
+    if resp is None:
+        # no results
+        return []
+    else:
+        for r in resp:
+            r["searchterm"] = search_term
+        return resp
+
 def main():
 
     parser = argparse.ArgumentParser()
@@ -102,43 +128,21 @@ def main():
     else:
         states = json.loads(stateCache.read_text())
 
+    
+    limit_state = False
+    if args.limit_state is not None:
+        state_codes = [s['state'] for s in states]
+        state_names = [s['description'] for s in states]
+        if args.limit_state.upper() in state_codes:
+            limit_state = args.limit_state.upper()
+        elif args.limit_state.upper() in state_names:
+            idx = state_names.index(args.limit_state.upper())
+            limit_state = state_codes[idx]
 
     for search_term in searchterms:
-        if search_term.isalpha():
-            search_string = strToT9(search_term)
-        else: 
-            search_string = search_term
-        console.print(f"Searching for'[b]{search_term.upper()}[/b]' ({search_string})")
+        console.print(f"Searching for'[b]{search_term.upper()}[/b]'")
 
-        limit_state = False
-        if args.limit_state is not None:
-            state_codes = [s['state'] for s in states]
-            state_names = [s['description'] for s in states]
-            if args.limit_state.upper() in state_codes:
-                limit_state = args.limit_state.upper()
-            elif args.limit_state.upper() in state_names:
-                idx = state_names.inx(args.limit_state.upper())
-                limit_state = state_codes[idx]
-
-        api_action_args = {
-            "type": args.search_type,
-            "query": search_string,
-
-        }
-        if limit_state:
-            api_action_args.update({
-                "state": limit_state
-            })
-        search_response: dict[str,str|list[dict[str,str|int]]] = api_action("searchDIDsUSA", **api_action_args)
-        resp = search_response.get("dids")
-
-        if resp is None:
-            # no results
-            continue
-        else:
-            for r in resp:
-                r["searchterm"] = search_term
-            results.extend(resp)
+        results.extend(performSearch(search_term, args.search_type, limit_state))
 
 
     console.print(f"     Found [b]{len(results)} numbers")
