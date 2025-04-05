@@ -82,6 +82,7 @@ def main():
         console.print("Search Terms: " + ",".join(searchterms))
 
         search_term = console.input("add search term> ")
+        search_term = search_term.strip()
         if search_term == "":
             break
         elif term_check_bad(search_term):
