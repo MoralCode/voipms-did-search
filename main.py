@@ -152,7 +152,7 @@ def main():
             for did in results:
                 did['sms'] = noyes(did['sms'])
                 writer.writerow(did)
-                add_row(table,did,search_string,search_term)
+                add_row(table,did,did['searchterm'],search_term)
 
         console.print(table)
         console.print(f"Wrote results to [b]{filename}[/b]")
