@@ -66,6 +66,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--search-type", choices=["contains", "startswith", "endswith"], default="contains", help="the type of search to perform")
+    parser.add_argument("--limit-state", type=str, help="limit search to one state")
 
     args = parser.parse_args()
 
@@ -106,7 +107,26 @@ def main():
             search_string = search_term
         console.print(f"Searching for'[b]{search_term.upper()}[/b]' ({search_string})")
 
-        search_response: dict[str,str|list[dict[str,str|int]]] = api_action("searchDIDsUSA",type=args.search_type,query=search_string)
+        limit_state = False
+        if args.limit_state is not None:
+            state_codes = [s['state'] for s in states]
+            state_names = [s['description'] for s in states]
+            if args.limit_state.upper() in state_codes:
+                limit_state = args.limit_state.upper()
+            elif args.limit_state.upper() in state_names:
+                idx = state_names.inx(args.limit_state.upper())
+                limit_state = state_codes[idx]
+
+        api_action_args = {
+            "type": args.search_type,
+            "query": search_string,
+
+        }
+        if limit_state:
+            api_action_args.update({
+                "state": limit_state
+            })
+        search_response: dict[str,str|list[dict[str,str|int]]] = api_action("searchDIDsUSA", **api_action_args)
         resp = search_response['dids']
         for r in resp:
             r["searchterm"] = search_term
