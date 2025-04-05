@@ -76,7 +76,7 @@ def main():
     searchterms = []
 
     search_term = None
-    term_check_bad = lambda x: re.match(r'[^a-zA-Z0-9]',x) or len(x) > 10 or len(search_term) < 3
+    term_check_bad = lambda x: not x.isalnum() and len(x) < 10 and len(x) > 3
 
     while search_term != "":
         console.print("Search Terms: " + ",".join(searchterms))
