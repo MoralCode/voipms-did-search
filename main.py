@@ -82,20 +82,9 @@ def main():
         states = json.loads(stateCache.read_text())
 
     search_string = strToT9(search_term)
-    console.print(f"Iterating states for '[b]{search_term.upper()}[/b]' ({search_string})")
-    for state in states:
-        console.print(f"Searching {state['description']}...")
-        search_response: dict[str,str|list[dict[str,str|int]]] = api_action("searchDIDsUSA",state=state['state'],type="contains",query=search_string)
-        if search_response['status'] == "success":
-            results.extend(search_response['dids'])
-            console.print(f"     Found [b]{len(search_response['dids'])}[/b] numbers")
-            # for did in search_response.dids:
-            #     start = did['did'].index(search_string)
-            #     end = start + len(search_string)
-            #     console.print(f"     Found: {did['did'][0:start]}[b green3]{did['did'][start:end]}[/b green3]{did['did'][end:]}")
-        else:
-            # console.print("     Nothing found.")
-            continue
+    search_response: dict[str,str|list[dict[str,str|int]]] = api_action("searchDIDsUSA",type="contains",query=search_string)
+    results.extend(search_response['dids'])
+    console.print(f"     Found [b]{len(search_response['dids'])}[/b] numbers")
     if len(results) > 0:
         table = Table(show_header=True,header_style="bold red",show_lines=True)
         for column in ["State","Number","Setup","Monthly","Minute","SMS?"]:
