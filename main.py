@@ -67,13 +67,6 @@ def main():
         search_term = console.input("Primary search> ")
         if term_check_bad(search_term):
             console.print("Invalid search term, must be 3-10 alphanumeric characters")
-    optional_search = console.input("Optional sub-search> ")
-    if optional_search != "":
-        while term_check_bad(optional_search) or search_term.upper() not in optional_search.upper() and search_term != "":
-            console.print("Invalid search term, must be no longer than 10 alphanumeric characters and contain original search term")
-            optional_search = console.input("Optional sub-search> ")
-    if optional_search == "":
-        console.print("Skipping optional sub-search")
     try:
         response = api_action("getStates")
         states.extend(response['states'])
@@ -102,18 +95,9 @@ def main():
         with open(filename,"w",newline="") as f:
             csvfile = csv.writer(f)
             columns = ["state","did","subsearch","sms"]
-            if not optional_search:
-                columns.remove("subsearch")
             csvfile.writerow(columns)
             for did in results:
-                if optional_search:
-                    subsearch_string = strToT9(optional_search) 
-                    has_subsearch = subsearch_string in did['did']
-                    csvfile.writerow([did['state'],did['did'],noyes[int(has_subsearch)],noyes[did['sms']]])
-                    if has_subsearch:
-                        add_row(table,did,subsearch_string,optional_search)
-                else:
-                    csvfile.writerow([did['state'],did['did'],noyes[did['sms']]])
+                csvfile.writerow([did['state'],did['did'],noyes[did['sms']]])
                 add_row(table,did,search_string,search_term)
 
         console.print(table)
