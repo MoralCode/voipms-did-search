@@ -87,15 +87,15 @@ def main():
     console.print(f"     Found [b]{len(search_response['dids'])}[/b] numbers")
     if len(results) > 0:
         table = Table(show_header=True,header_style="bold red",show_lines=True)
-        for column in ["State","Number","Setup","Monthly","Minute","SMS?"]:
+        for column in ["State","Number","Setup","Monthly","Minute","SMS?", "Searchterm"]:
             table.add_column(column)
-        filename = f"{search_term}_results.csv"
+        filename = f"all_results.csv"
         with open(filename,"w",newline="") as f:
             csvfile = csv.writer(f)
-            columns = ["state","did","subsearch","sms"]
+            columns = ["state","did","sms", "searchterm"]
             csvfile.writerow(columns)
             for did in results:
-                csvfile.writerow([did['state'],did['did'],noyes[did['sms']]])
+                csvfile.writerow([did['state'],did['did'],noyes[did['sms']], search_term])
                 add_row(table,did,search_string,search_term)
 
         console.print(table)
