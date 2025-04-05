@@ -91,12 +91,17 @@ def main():
         for column in ["State","Number","Setup","Monthly","Minute","SMS?", "Searchterm"]:
             table.add_column(column)
         filename = f"all_results.csv"
-        with open(filename,"w",newline="") as f:
-            csvfile = csv.writer(f)
+        file_existed = Path(filename).exists()
+        with open(filename,"a") as f:
             columns = ["state","did","sms", "searchterm"]
-            csvfile.writerow(columns)
+            writer = csv.DictWriter(f, fieldnames=columns, extrasaction='ignore')
+            if not file_existed:
+                writer.writeheader()
+
             for did in results:
-                csvfile.writerow([did['state'],did['did'],noyes(did['sms']), search_term])
+                did["searchterm"] = search_term
+                did['sms'] = noyes(did['sms'])
+                writer.writerow(did)
                 add_row(table,did,search_string,search_term)
 
         console.print(table)
