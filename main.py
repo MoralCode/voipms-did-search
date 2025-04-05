@@ -64,12 +64,20 @@ def main():
     console = Console()
     states = []
     results = []
-    search_term = ""
-    term_check_bad = lambda x: re.match(r'[^a-zA-Z0-9]',x) or len(x) > 10
-    while term_check_bad(search_term) or len(search_term) < 3:
-        search_term = console.input("Primary search> ")
+    searchterms = []
+
+    search_term = None
+    term_check_bad = lambda x: re.match(r'[^a-zA-Z0-9]',x) or len(x) > 10 or len(search_term) < 3
+
+    while search_term != "":
+        console.print("Search Terms: " + ",".join(searchterms))
+
+        search_term = console.input("add search term> ")
         if term_check_bad(search_term):
             console.print("Invalid search term, must be 3-10 alphanumeric characters")
+        else:
+            searchterms.append(search_term)
+
 
     stateCache = Path("states.json")
     if not stateCache.exists():
@@ -82,10 +90,22 @@ def main():
     else:
         states = json.loads(stateCache.read_text())
 
-    search_string = strToT9(search_term)
-    search_response: dict[str,str|list[dict[str,str|int]]] = api_action("searchDIDsUSA",type="contains",query=search_string)
-    results.extend(search_response['dids'])
-    console.print(f"     Found [b]{len(search_response['dids'])}[/b] numbers")
+
+    for search_term in searchterms:
+        if search_term.isalpha():
+            search_string = strToT9(search_term)
+        else: 
+            search_string = search_term
+        console.print(f"Searching for'[b]{search_term.upper()}[/b]' ({search_string})")
+
+        search_response: dict[str,str|list[dict[str,str|int]]] = api_action("searchDIDsUSA",type="contains",query=search_string)
+        resp = search_response['dids']
+        for r in resp:
+            r["searchterm"] = search_term
+        results.extend(resp)
+
+
+    console.print(f"     Found [b]{len(results)} numbers")
     if len(results) > 0:
         table = Table(show_header=True,header_style="bold red",show_lines=True)
         for column in ["State","Number","Setup","Monthly","Minute","SMS?", "Searchterm"]:
@@ -99,7 +119,6 @@ def main():
                 writer.writeheader()
 
             for did in results:
-                did["searchterm"] = search_term
                 did['sms'] = noyes(did['sms'])
                 writer.writerow(did)
                 add_row(table,did,search_string,search_term)
