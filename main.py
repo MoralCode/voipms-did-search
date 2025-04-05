@@ -66,7 +66,7 @@ def performSearch(search_term: str, search_type="contains", limit_state=False):
 
     Args:
         search_term (str): the term to search for (numbers or letters, 3-10 digits)
-        search_type (str, optional): the type of search to perform, contains, startswith or endswith. Defaults to "contains".
+        search_type (str, optional): the type of search to perform, contains, starts or ends. Defaults to "contains".
         limit_state (optional): whether to limit the state (if so, this should be set to the full state name or the state acronym). Defaults to False.
 
     Returns:
@@ -101,7 +101,7 @@ def main():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--search-type", choices=["contains", "startswith", "endswith"], default="contains", help="the type of search to perform")
+    parser.add_argument("--search-type", choices=["contains", "starts", "ends"], default="contains", help="the type of search to perform")
     parser.add_argument("--limit-state", type=str, help="limit search to one state")
     parser.add_argument("--longest-substring", action="store_true", help="iteratively reduce the search string size until matches are found")
 
