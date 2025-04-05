@@ -130,10 +130,15 @@ def main():
                 "state": limit_state
             })
         search_response: dict[str,str|list[dict[str,str|int]]] = api_action("searchDIDsUSA", **api_action_args)
-        resp = search_response['dids']
-        for r in resp:
-            r["searchterm"] = search_term
-        results.extend(resp)
+        resp = search_response.get("dids")
+
+        if resp is None:
+            # no results
+            continue
+        else:
+            for r in resp:
+                r["searchterm"] = search_term
+            results.extend(resp)
 
 
     console.print(f"     Found [b]{len(results)} numbers")
