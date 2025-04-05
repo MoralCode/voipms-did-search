@@ -103,6 +103,7 @@ def main():
 
     parser.add_argument("--search-type", choices=["contains", "startswith", "endswith"], default="contains", help="the type of search to perform")
     parser.add_argument("--limit-state", type=str, help="limit search to one state")
+    parser.add_argument("--longest-substring", action="store_true", help="iteratively reduce the search string size until matches are found")
 
     args = parser.parse_args()
 
@@ -151,8 +152,18 @@ def main():
 
     for search_term in searchterms:
         console.print(f"Searching for'[b]{search_term.upper()}[/b]'")
+        res = performSearch(search_term, args.search_type, limit_state)
 
-        results.extend(performSearch(search_term, args.search_type, limit_state))
+        while len(res) == 0 and args.longest_substring and len(search_term) > 3:
+            if args.search_type != "startswith":
+                search_term = search_term[1:]
+            else:
+                search_term = search_term[:-1]
+            console.print(f"Searching for'[b]{search_term.upper()}[/b]'")
+            res = performSearch(search_term, args.search_type, limit_state)
+
+        results.extend(res)
+
 
 
     console.print(f"     Found [b]{len(results)} numbers")
