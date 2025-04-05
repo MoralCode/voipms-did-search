@@ -82,7 +82,9 @@ def main():
         console.print("Search Terms: " + ",".join(searchterms))
 
         search_term = console.input("add search term> ")
-        if term_check_bad(search_term):
+        if search_term == "":
+            break
+        elif term_check_bad(search_term):
             console.print("Invalid search term, must be 3-10 alphanumeric characters")
         else:
             searchterms.append(search_term)
