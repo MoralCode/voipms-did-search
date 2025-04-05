@@ -6,6 +6,8 @@ from rich.console import Console
 from rich.table import Table
 from dotenv import load_dotenv
 import os
+from pathlib import Path
+import json
 
 load_dotenv()
 ## App below
@@ -67,11 +69,18 @@ def main():
         search_term = console.input("Primary search> ")
         if term_check_bad(search_term):
             console.print("Invalid search term, must be 3-10 alphanumeric characters")
-    try:
-        response = api_action("getStates")
-        states.extend(response['states'])
-    except Exception as e:
-        console.print_exception()
+
+    stateCache = Path("states.json")
+    if not stateCache.exists():
+        try:
+            response = api_action("getStates")
+            states.extend(response['states'])
+            stateCache.write_text(json.dumps(states))
+        except Exception as e:
+            console.print_exception()
+    else:
+        states = json.loads(stateCache.read_text())
+
     search_string = strToT9(search_term)
     console.print(f"Iterating states for '[b]{search_term.upper()}[/b]' ({search_string})")
     for state in states:
