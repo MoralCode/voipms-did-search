@@ -14,7 +14,8 @@ load_dotenv()
 
 api_root = "https://voip.ms/api/v1/rest.php"
 
-noyes = ["N","Y"]
+def noyes(val:bool):
+    return "Y" if bool(val) else 'N'
 
 def api_action(action: str,**kwargs):
     params = {
@@ -56,7 +57,7 @@ def add_row(table,did,search_string,search_term):
         f"${did['perminute_setup']} / ${did['flat_setup']}",
         f"${did['perminute_monthly']} / ${did['flat_monthly']}",
         f"${did['perminute_minute']} / ${did['flat_minute']}",
-        noyes[did['sms']]
+        noyes(did['sms'])
     )
 
 def main():
@@ -95,7 +96,7 @@ def main():
             columns = ["state","did","sms", "searchterm"]
             csvfile.writerow(columns)
             for did in results:
-                csvfile.writerow([did['state'],did['did'],noyes[did['sms']], search_term])
+                csvfile.writerow([did['state'],did['did'],noyes(did['sms']), search_term])
                 add_row(table,did,search_string,search_term)
 
         console.print(table)
