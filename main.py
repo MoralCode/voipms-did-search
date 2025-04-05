@@ -62,6 +62,16 @@ def add_row(table,did,search_string,search_term):
     )
 
 def performSearch(search_term: str, search_type="contains", limit_state=False):
+    """perform a search using the API
+
+    Args:
+        search_term (str): the term to search for (numbers or letters, 3-10 digits)
+        search_type (str, optional): the type of search to perform, contains, startswith or endswith. Defaults to "contains".
+        limit_state (optional): whether to limit the state (if so, this should be set to the full state name or the state acronym). Defaults to False.
+
+    Returns:
+        _type_: _description_
+    """
     if search_term.isalpha():
         search_string = strToT9(search_term)
     else: 
