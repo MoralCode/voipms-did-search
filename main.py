@@ -107,27 +107,34 @@ def main():
     parser.add_argument("--search-type", choices=["contains", "starts", "ends"], default="contains", help="the type of search to perform")
     parser.add_argument("--limit-state", type=str, help="limit search to one state")
     parser.add_argument("--longest-substring", action="store_true", help="iteratively reduce the search string size until matches are found")
+    parser.add_argument("searchterm",nargs=argparse.REMAINDER, help="one or more terms to search for")
 
     args = parser.parse_args()
 
     console = Console()
     states = []
     results = []
-    searchterms = []
+    searchterms = args.searchterm or []
+
+    for t in searchterms:
+        if term_check_bad(t):
+            console.print(f"Invalid search term {t}, must be 3-10 alphanumeric characters")
+            del searchterms[searchterms.index(t)]
 
     search_term = None
 
-    while search_term != "":
-        console.print("Search Terms: " + ",".join(searchterms))
+    if len(searchterms) == 0:
+        while search_term != "":
+            console.print("Search Terms: " + ",".join(searchterms))
 
-        search_term = console.input("add search term> ")
-        search_term = search_term.strip()
-        if search_term == "":
-            break
-        elif term_check_bad(search_term):
-            console.print("Invalid search term, must be 3-10 alphanumeric characters")
-        else:
-            searchterms.append(search_term)
+            search_term = console.input("add search term> ")
+            search_term = search_term.strip()
+            if search_term == "":
+                break
+            elif term_check_bad(search_term):
+                console.print("Invalid search term, must be 3-10 alphanumeric characters")
+            else:
+                searchterms.append(search_term)
 
 
     stateCache = Path("states.json")
