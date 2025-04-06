@@ -97,6 +97,9 @@ def performSearch(search_term: str, search_type="contains", limit_state=False):
             r["searchterm"] = search_term
         return resp
 
+def term_check_bad(x):
+    return not x.isalnum() and len(x) < 10 and len(x) > 3
+
 def main():
 
     parser = argparse.ArgumentParser()
@@ -113,7 +116,6 @@ def main():
     searchterms = []
 
     search_term = None
-    term_check_bad = lambda x: not x.isalnum() and len(x) < 10 and len(x) > 3
 
     while search_term != "":
         console.print("Search Terms: " + ",".join(searchterms))
