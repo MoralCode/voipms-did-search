@@ -34,6 +34,9 @@ def api_action(action: str,**kwargs):
         raise Exception(r.url,r.request.body)
 
 def strToT9(string: str):
+    if string.isnumeric():
+        return string
+
     t9_str_list = []
     t9_tuple = ("","","2ABC","3DEF","4GHI","5JKL","6MNO","7PQRS","8TUV","9WXYZ")
     for letter in string:
